@@ -34,6 +34,10 @@ git -C "${src}" fetch --quiet --depth 1 \
 git -C "${src}" checkout --quiet FETCH_HEAD
 sed -i 's|^LDADD=-ldl -lpcap -lnetsnmp -loflops_test$|LDADD=-ldl -lpcap -lnetsnmp liboflops_test.la|' \
     "${src}/oflops/Makefile.am"
+# glibc dropped the non-standard pthread_yield (it only ever called
+# sched_yield) and GCC 14 rejects implicit declarations, so use the POSIX
+# call it wrapped.
+sed -i 's|pthread_yield()|sched_yield()|' "${src}/oflops/wc_event.c"
 (
     cd "${src}/oflops"
     ./boot.sh

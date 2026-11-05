@@ -273,7 +273,7 @@ on the runner.
 
 ### Supply chain
 
-- Both stages pin the `ubuntu:22.04` base by digest, and
+- Both stages pin the `ubuntu:24.04` base by digest, and
   Dependabot (`docker` ecosystem on `/docker`) bumps it weekly.
 - hadolint runs in pre-commit with `.hadolint.yaml`, which records the
   justification for each ignored rule.
