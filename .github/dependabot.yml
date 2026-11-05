@@ -17,7 +17,10 @@ updates:
       default-days: 7
     open-pull-requests-limit: 15
 
-  # Keep the pinned ubuntu base-image digest in docker/ current.
+  # Keep the pinned ubuntu base-image digest in docker/ current. Only the
+  # digest moves: a new Ubuntu release changes the package set the suites
+  # run against (an unreviewed 22.04 -> 25.10 bump broke cbench), so
+  # release changes are made by hand and tested.
   - package-ecosystem: "docker"
     directory: "/docker"
     schedule:
@@ -26,4 +29,9 @@ updates:
       prefix: "Build(docker)"
     cooldown:
       default-days: 7
+    ignore:
+      - dependency-name: "ubuntu"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
     open-pull-requests-limit: 15

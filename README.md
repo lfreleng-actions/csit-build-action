@@ -273,8 +273,10 @@ on the runner.
 
 ### Supply chain
 
-- Both stages pin the `ubuntu:24.04` base by digest, and
-  Dependabot (`docker` ecosystem on `/docker`) bumps it weekly.
+- Both stages pin the `ubuntu:24.04` base by digest, and Dependabot
+  (`docker` ecosystem on `/docker`) refreshes the digest weekly. It never
+  moves to another Ubuntu release: changing release changes the package
+  set the suites run against, so it needs a deliberate, tested PR.
 - hadolint runs in pre-commit with `.hadolint.yaml`, which records the
   justification for each ignored rule.
 - The `Node images` CI job builds both targets with the OpenDaylight
