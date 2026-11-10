@@ -26,7 +26,9 @@
 # Supply chain: the base image is pinned by digest and Dependabot (docker
 # ecosystem) keeps the digest current. Distro packages are deliberately not
 # pinned (see .hadolint.yaml, DL3008); CI builds both targets and gates them
-# on an SBOM + Grype scan instead.
+# on an SBOM + Grype scan instead. The node stage upgrades distro packages
+# at build time, so security updates published after the pinned base was
+# built are included.
 #
 # Root: the nodes stand in for whole VMs. sshd must start as root to bind
 # port 22 and switch to the logged-in user, and suites run sudo on the
@@ -44,6 +46,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY install-packages.sh /usr/local/sbin/csit-install-packages
 RUN --mount=type=bind,from=packages,target=/tmp/csit-packages \
     apt-get update \
+    && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
         iproute2 \

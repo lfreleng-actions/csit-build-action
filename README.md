@@ -277,6 +277,9 @@ on the runner.
   (`docker` ecosystem on `/docker`) refreshes the digest weekly. It never
   moves to another Ubuntu release: changing release changes the package
   set the suites run against, so it needs a deliberate, tested PR.
+- The `node` stage runs `apt-get upgrade` at build time on top of the
+  digest-pinned base, and `tools` inherits it, so a build picks up distro
+  security fixes the base predates.
 - hadolint runs in pre-commit with `.hadolint.yaml`, which records the
   justification for each ignored rule.
 - The `Node images` CI job builds both targets with the OpenDaylight
