@@ -286,6 +286,9 @@ on the runner.
   package set plus the bare image, checks them, generates an SBOM for
   each of the three and fails on High or Critical Grype findings in any.
   It uploads the SBOMs and the scan results as artifacts.
+- `.grype.yaml` holds the scan's ignore rules. Each rule names one CVE
+  and one source package and states why the finding is wrong. Delete a
+  rule once a scan without it passes.
 - A package script that builds from source removes its build
   dependencies in the same layer; `examples/odl/packages/tools.sh` shows
   how.

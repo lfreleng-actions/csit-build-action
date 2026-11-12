@@ -1,0 +1,21 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 The Linux Foundation
+#
+# Grype ignore rules for the Node images CI job. Each rule names one
+# CVE and one source package and says why the finding is wrong. Remove a
+# rule once a scan without it passes: Grype's database has caught up.
+
+ignore:
+  # Password-authentication bypass in sshd built against musl libc
+  # without PAM (Alpine). Ubuntu builds OpenSSH against glibc with PAM
+  # and marks every release not-affected; no fix exists or is needed.
+  # Grype's Ubuntu feed still carries the pre-triage status.
+  # https://ubuntu.com/security/CVE-2026-123158
+  - vulnerability: CVE-2026-123158
+    reason: >-
+      Ubuntu not-affected: OpenSSH is built with glibc and PAM, so the
+      musl-without-PAM code path is not present
+    package:
+      type: deb
+      upstream-name: openssh
