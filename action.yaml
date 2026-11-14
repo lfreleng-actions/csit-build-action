@@ -358,6 +358,20 @@ runs:
       run: |
         "${GITHUB_ACTION_PATH}/scripts/lab-down-${CSIT_BACKEND}.sh"
 
+    # The report runs Python on the caller's results, so pin the interpreter
+    # here rather than take whatever python3 the caller's PATH resolves.
+    # update-environment: false leaves the caller's PATH and Python alone.
+    # Gated like its consumer, so the other modes never depend on fetching
+    # an interpreter they do not use; the report refuses an empty path.
+    - name: Set up Python for the report
+      id: setup-python
+      if: inputs.mode == 'report'
+      # yamllint disable-line rule:line-length
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+      with:
+        python-version: "3.12"
+        update-environment: false
+
     # Jenkins gave each job a Robot plugin verdict and mailed the project.
     # A fan-out of many jobs needs one readable page covering every job it
     # dispatched, including any that produced no results.
@@ -365,12 +379,17 @@ runs:
       if: inputs.mode == 'report'
       shell: bash
       env:
+        PYTHON: ${{ steps.setup-python.outputs.python-path }}
         RESULTS_DIR: ${{ inputs.results-dir }}
         EXPECTED_JOBS: ${{ inputs.expected-jobs }}
         HTML_DIR: ${{ inputs.html-dir }}
         TITLE: ${{ inputs.title }}
       run: |
         set -euo pipefail
+        if [ -z "${PYTHON}" ]; then
+            echo "::error::setup-python returned no interpreter path"
+            exit 1
+        fi
         expected=""
         if [ -n "${EXPECTED_JOBS}" ]; then
             expected="${RUNNER_TEMP}/expected-jobs.txt"
@@ -389,5 +408,7 @@ runs:
         if [ -n "${HTML_DIR}" ]; then
             args+=(--html "${HTML_DIR}" --title "${TITLE}")
         fi
-        python3 "${GITHUB_ACTION_PATH}/scripts/robot-gate.py" \
+        # No -I: it implies -P, which drops the script's directory from
+        # sys.path, and robot-gate.py imports csit_site from beside it.
+        "$PYTHON" "${GITHUB_ACTION_PATH}/scripts/robot-gate.py" \
             --summary "${RESULTS_DIR}" "${expected}" "${args[@]}"
