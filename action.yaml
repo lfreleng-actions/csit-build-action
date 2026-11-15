@@ -320,6 +320,24 @@ runs:
           esac
         done < "$env_file" >> "$GITHUB_OUTPUT"
 
+    # The gate and the report run Python on the caller's results, so pin the
+    # interpreter here rather than take whatever python3 the caller's PATH
+    # resolves. update-environment: false leaves the caller's PATH and Python
+    # alone, so the test command still sees its own. Gated like its consumers,
+    # so the other modes never depend on fetching an interpreter they do not
+    # use; the report refuses an empty path. Before the lab, so a failed
+    # fetch does not cost a provisioning.
+    - name: Set up Python for the gate and report
+      id: setup-python
+      if: >-
+        inputs.mode == 'report' ||
+        (inputs.mode == 'run' && inputs.robot-output != '')
+      # yamllint disable-line rule:line-length
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+      with:
+        python-version: "3.12"
+        update-environment: false
+
     - name: Bring up CSIT lab
       id: lab
       if: inputs.mode == 'run' || inputs.mode == 'lab-up'
@@ -347,6 +365,8 @@ runs:
         ROBOT_PASS_THRESHOLD: ${{ inputs.robot-pass-threshold }}
         ROBOT_UNSTABLE_THRESHOLD: ${{ inputs.robot-unstable-threshold }}
         CSIT_JOB: ${{ inputs.job-name }}
+        # robot-gate.py re-runs itself under this, not the caller's python3.
+        CSIT_PYTHON: ${{ steps.setup-python.outputs.python-path }}
       run: |
         "${GITHUB_ACTION_PATH}/scripts/run-test.sh"
 
@@ -357,20 +377,6 @@ runs:
         CSIT_BACKEND: ${{ inputs.backend }}
       run: |
         "${GITHUB_ACTION_PATH}/scripts/lab-down-${CSIT_BACKEND}.sh"
-
-    # The report runs Python on the caller's results, so pin the interpreter
-    # here rather than take whatever python3 the caller's PATH resolves.
-    # update-environment: false leaves the caller's PATH and Python alone.
-    # Gated like its consumer, so the other modes never depend on fetching
-    # an interpreter they do not use; the report refuses an empty path.
-    - name: Set up Python for the report
-      id: setup-python
-      if: inputs.mode == 'report'
-      # yamllint disable-line rule:line-length
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
-      with:
-        python-version: "3.12"
-        update-environment: false
 
     # Jenkins gave each job a Robot plugin verdict and mailed the project.
     # A fan-out of many jobs needs one readable page covering every job it

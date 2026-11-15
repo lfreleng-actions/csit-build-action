@@ -39,8 +39,32 @@ from collections import Counter
 from itertools import dropwhile
 from pathlib import Path
 
+
+def use_pinned_python() -> None:
+    """Re-run this script under ``$CSIT_PYTHON`` when it names another one.
+
+    run-test.sh starts the gate with the caller's ``python3``, which may be
+    older than the code supports; the action passes its pinned interpreter
+    here instead of on PATH, so the test command's environment keeps the
+    caller's Python. The variable is dropped first, so this runs once.
+
+    ``--summary`` is already started under the pinned interpreter, so a
+    ``CSIT_PYTHON`` it inherits from the caller's job is discarded unused.
+    """
+    pinned = os.environ.pop("CSIT_PYTHON", "")
+    if sys.argv[1:2] == ["--summary"]:
+        return
+    if pinned and os.path.realpath(pinned) != os.path.realpath(sys.executable):
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os.execv(pinned, [pinned, *sys.argv])
+
+
+# Before csit_site, which needs a newer Python than the caller may have.
+use_pinned_python()
+
 # The site renderer sits beside this script, first on sys.path: no packaging.
-from csit_site import (
+from csit_site import (  # noqa: E402
     created_top,
     html_overlaps_job,
     job_list,

@@ -8,7 +8,7 @@ import json
 import os
 import shutil
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from fnmatch import fnmatch
 from html import escape
 from pathlib import Path
@@ -16,9 +16,6 @@ from urllib.parse import quote
 
 # Files report.html/log.html reference by relative path, kept beside them.
 SUPPORT_FILES = ("log-*.js", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg")
-
-# timezone.utc, not datetime.UTC: callers on ubuntu-22.04 run Python 3.10.
-_UTC = timezone.utc  # noqa: UP017
 
 # Same look as lfreleng-actions/github-security-report-action. Inlined, with
 # no jinja or CDN, so a release gate never waits on a third-party asset.
@@ -254,7 +251,7 @@ def write_site(
         out / "index.html",
         SITE.format(
             title=escape(title or "CSIT"),
-            when=datetime.now(_UTC).strftime("%Y-%m-%d %H:%M UTC"),
+            when=datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
             run=run,
             cls="go" if ok else "nogo",
             verdict=(
@@ -272,7 +269,7 @@ def write_site(
         json.dumps(
             {
                 "title": title,
-                "generated": datetime.now(_UTC).isoformat(),
+                "generated": datetime.now(UTC).isoformat(),
                 "run": f"{server}/{repo}/actions/runs/{run_id}" if run_id else "",
                 "green": good,
                 "jobs": total_jobs,
