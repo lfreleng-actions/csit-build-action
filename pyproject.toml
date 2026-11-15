@@ -8,7 +8,7 @@
 # strictest preset and buries real defects under hundreds of inference
 # warnings.
 [tool.basedpyright]
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 pythonPlatform = "All"
 typeCheckingMode = "standard"
 include = ["scripts", "tests"]
