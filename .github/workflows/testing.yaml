@@ -60,6 +60,15 @@ jobs:
           # Robot result gate
           tests/test-robot-gate.sh
 
+      # The gate's one re-run under the pinned $CSIT_PYTHON, and the
+      # --summary bypass that ignores an inherited CSIT_PYTHON. The script
+      # is not executable, so start it through bash.
+      - name: "Robot gate pinned Python"
+        shell: bash
+        run: |
+          # Robot gate pinned Python
+          bash tests/test-pinned-python.sh
+
       # Explicit URLs, pinned and snapshot Maven coordinates and the
       # version-pom lookup, against a throwaway repository on localhost.
       - name: "Artifact resolution"
