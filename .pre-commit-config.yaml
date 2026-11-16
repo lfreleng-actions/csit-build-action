@@ -179,7 +179,7 @@ repos:
         types: [yaml]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 25bcf95026b96e2dd3c0aec3090c3d6ef6ca2e6c  # frozen: v0.17.3
+    rev: ef6cf06c079dd6b299dfc720b0f14400c9d168e1  # frozen: v0.17.5
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -248,7 +248,7 @@ repos:
   # which builds a 'golang@system' environment for the gitleaks hook
   # above in the same way.
   - repo: https://github.com/kjanat/actionlint
-    rev: 2da2ceb4af2c7ecc48f5b9311d85080c3971b5f0  # frozen: v1.17.0
+    rev: 1a9278318c43b72cdf644214128fb0786d210147  # frozen: v1.17
     hooks:
       - id: actionlint-shellcheck
 
@@ -265,7 +265,7 @@ repos:
       - id: basedpyright
 
   - repo: https://github.com/lfreleng-actions/gha-workflow-linter
-    rev: 00aec232d3fd85436fff24dfeaad23921c5db1cb  # frozen: v1.10.1
+    rev: 380c07e2a17ef43c3c5b8579db3b4a46af475bf5  # frozen: v1.12.0
     hooks:
       - id: gha-workflow-linter
 
